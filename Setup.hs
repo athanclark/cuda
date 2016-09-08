@@ -8,6 +8,7 @@ import Distribution.Simple.Program.Db
 import Distribution.Simple.LocalBuildInfo
 import Distribution.Simple.PreProcess                               hiding ( ppC2hs )
 import Distribution.Simple.Program
+import Distribution.Simple.Program.Find
 import Distribution.Simple.Setup
 import Distribution.Simple.Utils
 import Distribution.System
@@ -233,7 +234,7 @@ importLibraryToDLLFileName importLibPath = do
   --          U nvcuda_NULL_THUNK_DATA
   --
   nmOutput <- getProgramInvocationOutput normal (simpleProgramInvocation "nm" [importLibPath])
-  return $ find (isInfixOf ("" <.> dllExtension)) (lines nmOutput)
+  return $ find (Distribution.Simple.Utils.isInfixOf ("" <.> dllExtension)) (lines nmOutput)
 
 
 -- Slightly modified version of `words` from base - it takes predicate saying on
@@ -474,8 +475,8 @@ findProgram :: Verbosity -> FilePath -> IO (Maybe FilePath)
 findProgram verbosity prog = do
   result <- findProgramOnSearchPath verbosity defaultProgramSearchPath prog
   case result of
-    Nothing       -> return Nothing
-    Just (path,_) -> return (Just path)
+    Nothing   -> return Nothing
+    Just path -> return (Just path)
 
 
 -- Reads user-provided `cuda.buildinfo` if present, otherwise loads `cuda.buildinfo.generated`
